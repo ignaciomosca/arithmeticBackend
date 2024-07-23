@@ -1,0 +1,55 @@
+services:
+  api: &main_app
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: arithmetic:${ARITHMETIC_VERSION:-latest}
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ARITHMETIC_HOST: 0.0.0.0
+      ARITHMETIC_DB_HOST: arithmetic-db
+      ARITHMETIC_DB_PORT: 5432
+      ARITHMETIC_DB_USER: arithmetic
+      ARITHMETIC_DB_PASS: arithmetic
+      ARITHMETIC_DB_BASE: arithmetic
+
+  db:
+    image: postgres:16.3-bullseye
+    hostname: arithmetic-db
+    environment:
+      POSTGRES_PASSWORD: "arithmetic"
+      POSTGRES_USER: "arithmetic"
+      POSTGRES_DB: "arithmetic"
+    volumes:
+      - arithmetic-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: pg_isready -U arithmetic
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+  migrator:
+    image: arithmetic:${ARITHMETIC_VERSION:-latest}
+    restart: "no"
+    command: alembic upgrade head
+    environment:
+      ARITHMETIC_DB_HOST: arithmetic-db
+      ARITHMETIC_DB_PORT: 5432
+      ARITHMETIC_DB_USER: arithmetic
+      ARITHMETIC_DB_PASS: arithmetic
+      ARITHMETIC_DB_BASE: arithmetic
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+
+volumes:
+  arithmetic-db-data:
+    name: arithmetic-db-data
