@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     db_base: str = "arithmetic"
     db_echo: bool = False
 
+    secret_key: str = ""
+    algorithm: str = ""
+
     @property
     def db_url(self) -> URL:
         """
