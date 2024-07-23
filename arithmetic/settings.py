@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     db_port: int = 5432
     db_user: str = "arithmetic"
     db_pass: str = "arithmetic"
-    db_base: str = "admin"
+    db_base: str = "arithmetic"
     db_echo: bool = False
 
     @property
