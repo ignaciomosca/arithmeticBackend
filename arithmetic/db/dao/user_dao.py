@@ -1,4 +1,8 @@
+from typing import Optional
+
 from fastapi import Depends
+from sqlalchemy import select
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from arithmetic.db.dependencies import get_db_session
@@ -15,6 +19,24 @@ class UserDAO:
         """
         Add single user to session.
 
-        :param name: name of a user.
+        :param username: username of a user.
+        :param password: password of a user.
         """
         self.session.add(UserModel(username=username, password=password))
+
+    async def get_user(self, username: str) -> Optional[UserModel]:
+        """
+        Get a single user model by its username.
+
+        :param username: username of the user.
+        :return: UserModel instance if found, None otherwise.
+        """
+        try:
+            result = await self.session.execute(
+                select(UserModel).filter_by(username=username),
+            )
+            return result.scalar_one()
+        except NoResultFound:
+            return None
+        except Exception as e:
+            raise e

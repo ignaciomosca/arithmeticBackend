@@ -13,3 +13,10 @@ class Token(BaseModel):
 
     access_token: str
     token_type: str
+
+
+class ValidatedUser(BaseModel):
+    """Create a validated user model."""
+
+    username: str
+    user_id: str
