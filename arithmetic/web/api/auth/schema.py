@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class CreateUserRequest(BaseModel):
+class UserRequest(BaseModel):
     """Create user request model."""
 
     username: str
@@ -18,5 +18,6 @@ class Token(BaseModel):
 class ValidatedUser(BaseModel):
     """Create a validated user model."""
 
+    user_id: int
     username: str
-    user_id: str
+    balance: int

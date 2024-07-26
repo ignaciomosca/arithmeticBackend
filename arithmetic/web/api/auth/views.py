@@ -2,26 +2,24 @@ from datetime import datetime, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from starlette import status
 
 from arithmetic.db.dao.user_dao import UserDAO
+from arithmetic.services.security_service import oauth2_bearer
 from arithmetic.settings import settings
-from arithmetic.web.api.auth.schema import CreateUserRequest, Token, ValidatedUser
+from arithmetic.web.api.auth.schema import Token, UserRequest, ValidatedUser
 
 router = APIRouter()
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
-
 BEARER = "bearer"
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(
-    new_user: CreateUserRequest,
+    new_user: UserRequest,
     user_dao: UserDAO = Depends(),
 ) -> None:
     """
@@ -36,8 +34,7 @@ async def create_user(
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(
-    username: str,
-    password: str,
+    login_user: UserRequest,
     user_dao: UserDAO = Depends(),
 ) -> Token:
     """
@@ -46,19 +43,25 @@ async def login_for_access_token(
     :param new_user: new user model.
     :param user_dao: DAO for user models.
     """
-    user = await user_dao.get_user(username)
-    if not user or not bcrypt_context.verify(password, user.password):
+    user = await user_dao.get_user(login_user.username)
+    if not user or not bcrypt_context.verify(login_user.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate user",
         )
-    token = await create_access_token(username, user.id, timedelta(minutes=20))
+    token = await create_access_token(
+        login_user.username,
+        user.id,
+        user.balance,
+        timedelta(minutes=20),
+    )
     return Token(access_token=token, token_type=BEARER)
 
 
 async def create_access_token(
     username: str,
     user_id: int,
+    user_balance: int,
     expires_delta: timedelta,
 ) -> str:
     """
@@ -68,8 +71,8 @@ async def create_access_token(
     :param user_id: id of the user.
     :param expires_delta: amount of time it takes for the token to expire.
     """
-    encode = {"sub": username, "id": user_id}
-    expires = datetime.now() + expires_delta
+    encode = {"sub": username, "id": user_id, "balance": user_balance}
+    expires = datetime.utcnow() + expires_delta
     encode.update({"exp": expires})
     return jwt.encode(encode, settings.secret_key, algorithm=settings.algorithm)
 
@@ -89,15 +92,14 @@ async def get_current_user(
             algorithms=[settings.algorithm],
         )
         username: str = payload.get("sub")
-        user_id: str = payload.get("id")
-        if username is None or user_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Could not validate user",
-            )
-        return ValidatedUser(username=username, user_id=user_id)
+        user_id: int = payload.get("id")
+        balance: int = payload.get("balance")
+        return ValidatedUser(username=username, user_id=user_id, balance=balance)
     except JWTError as err:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate user",
         ) from err
+
+
+user_dependency = Annotated[dict, Depends(get_current_user)]

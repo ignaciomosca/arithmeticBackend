@@ -48,6 +48,7 @@ class Settings(BaseSettings):
 
     secret_key: str = ""
     algorithm: str = ""
+    random: str = ""
 
     @property
     def db_url(self) -> URL:
