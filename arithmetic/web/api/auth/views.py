@@ -1,15 +1,13 @@
 from datetime import datetime, timedelta
-from typing import Annotated
 
+import jwt
 from fastapi import APIRouter, Depends, HTTPException
-from jose import JWTError, jwt
 from passlib.context import CryptContext
 from starlette import status
 
 from arithmetic.db.dao.user_dao import UserDAO
-from arithmetic.services.security_service import oauth2_bearer
 from arithmetic.settings import settings
-from arithmetic.web.api.auth.schema import Token, UserRequest, ValidatedUser
+from arithmetic.web.api.auth.schema import Token, UserRequest
 
 router = APIRouter()
 
@@ -75,31 +73,3 @@ async def create_access_token(
     expires = datetime.utcnow() + expires_delta
     encode.update({"exp": expires})
     return jwt.encode(encode, settings.secret_key, algorithm=settings.algorithm)
-
-
-async def get_current_user(
-    token: Annotated[str, Depends(oauth2_bearer)],
-) -> ValidatedUser:
-    """
-    Gets a user from an OAuth token.
-
-    :param token: the users token.
-    """
-    try:
-        payload = jwt.decode(
-            token,
-            settings.secret_key,
-            algorithms=[settings.algorithm],
-        )
-        username: str = payload.get("sub")
-        user_id: int = payload.get("id")
-        balance: int = payload.get("balance")
-        return ValidatedUser(username=username, user_id=user_id, balance=balance)
-    except JWTError as err:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate user",
-        ) from err
-
-
-user_dependency = Annotated[dict, Depends(get_current_user)]
