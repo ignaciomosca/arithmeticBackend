@@ -21,7 +21,6 @@ async def test_creation(
     response = await client.put(url, json={"name": test_name})
     assert response.status_code == status.HTTP_200_OK
     dao = DummyDAO(dbsession)
-
     instances = await dao.filter(name=test_name)
     assert instances[0].name == test_name
 
