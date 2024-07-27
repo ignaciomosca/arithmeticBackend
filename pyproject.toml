@@ -30,6 +30,7 @@ passlib = "^1.7.4"
 python-multipart = "^0.0.9"
 pyjwt = "^2.7.0"
 pycryptodome = "^3.15.0"
+magnum = "^18.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
