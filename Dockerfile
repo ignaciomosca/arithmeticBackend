@@ -5,7 +5,6 @@ RUN apt-get update && apt-get install -y \
 
 
 RUN pip install poetry==1.8.2
-RUN pip install "python-jose[cryptography]"
 
 # Configuring poetry
 RUN poetry config virtualenvs.create false

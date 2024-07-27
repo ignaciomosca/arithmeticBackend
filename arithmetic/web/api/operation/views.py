@@ -15,7 +15,7 @@ async def new_operation(
     user: user_dependency,
     operation_service: OperationService = Depends(),
     record_service: RecordService = Depends(),
-) -> None:
+) -> str:
     """
     Create and record a new operation.
 
@@ -36,3 +36,4 @@ async def new_operation(
         user_balance=user.balance - operation.cost,
         operation_response=operation_response,
     )
+    return operation_response
