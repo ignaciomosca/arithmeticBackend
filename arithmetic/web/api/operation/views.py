@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from starlette import status
 
 from arithmetic.services.operation_service import OperationService
+from arithmetic.services.record_service import RecordService
 from arithmetic.services.security_service import user_dependency
 from arithmetic.web.api.operation.schema import OperationBase
 
@@ -13,18 +14,25 @@ async def new_operation(
     new_operation: OperationBase,
     user: user_dependency,
     operation_service: OperationService = Depends(),
-) -> str:
+    record_service: RecordService = Depends(),
+) -> None:
     """
     Create and record a new operation.
 
     :param operation_dao: DAO for operation models.
     :return: list of operation objects from database.
     """
-    # store operation
-    # store relationship
-    return await operation_service.perform_operation(
+    operation = await operation_service.get_operation_cost(new_operation.type)
+    operation_response = await operation_service.perform_operation(
         user.balance,
         new_operation.type,
         new_operation.first_term,
         new_operation.second_term,
+    )
+    await record_service.create_record(
+        user_id=user.user_id,
+        operation_id=operation.operation_id,
+        amount=operation.cost,
+        user_balance=user.balance - operation.cost,
+        operation_response=operation_response,
     )

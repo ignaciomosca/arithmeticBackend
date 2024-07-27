@@ -10,7 +10,7 @@ class OperationEnum(PyEnum):
     """Model for operation types."""
 
     ADDITION = "addition"
-    SUBSTRACTION = "substraction"
+    SUBTRACTION = "subtraction"
     MULTIPLICATION = "multiplication"
     DIVISION = "division"
     SQUARE = "squareRoot"

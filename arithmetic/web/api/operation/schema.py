@@ -15,6 +15,13 @@ class OperationEnum(str, Enum):
     RANDOM = "randomString"
 
 
+class OperationDTO(BaseModel):
+    """DTO that represents and operation id and its cost."""
+
+    operation_id: int
+    cost: int
+
+
 class OperationBase(BaseModel):
     """Base Pydantic model for Operation."""
 
