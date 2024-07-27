@@ -26,7 +26,7 @@ def upgrade() -> None:
             "type",
             sa.Enum(
                 "ADDITION",
-                "SUBSTRACTION",
+                "SUBTRACTION",
                 "MULTIPLICATION",
                 "DIVISION",
                 "SQUARE",
