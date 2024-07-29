@@ -1,4 +1,4 @@
-FROM python:3.11.4-slim-bullseye as prod
+FROM python:3.11.4-slim-bullseye AS prod
 RUN apt-get update && apt-get install -y \
   gcc \
   && rm -rf /var/lib/apt/lists/*
@@ -27,6 +27,6 @@ RUN --mount=type=cache,target=/tmp/poetry_cache poetry install --only main
 
 CMD ["/usr/local/bin/python", "-m", "arithmetic"]
 
-FROM prod as dev
+FROM prod AS dev
 
 RUN --mount=type=cache,target=/tmp/poetry_cache poetry install
