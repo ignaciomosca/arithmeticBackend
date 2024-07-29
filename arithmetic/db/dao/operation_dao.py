@@ -21,11 +21,10 @@ class OperationDAO:
         :return: OperationModel instance if found, None otherwise.
         """
         try:
-            result = await self.session.execute(
-                select(OperationModel).filter_by(type=type),
-            )
+            query = select(OperationModel).where(OperationModel.type == "addition")
+            result = await self.session.execute(query)
             return result.scalar_one()
         except NoResultFound as err:
-            raise Exception(f"Invalid Type {type.value}") from err
+            raise Exception(f"Invalid Type {type.name} {type.value}") from err
         except Exception as e:
             raise e

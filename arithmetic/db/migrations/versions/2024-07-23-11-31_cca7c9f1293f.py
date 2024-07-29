@@ -25,12 +25,12 @@ def upgrade() -> None:
         sa.Column(
             "type",
             sa.Enum(
-                "ADDITION",
-                "SUBTRACTION",
-                "MULTIPLICATION",
-                "DIVISION",
-                "SQUARE",
-                "RANDOM",
+                "addition",
+                "subtraction",
+                "multiplication",
+                "division",
+                "squareRoot",
+                "randomString",
                 name="operationenum",
             ),
             nullable=False,
@@ -38,6 +38,7 @@ def upgrade() -> None:
         sa.Column("cost", sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
+
     op.create_table(
         "records",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
@@ -55,7 +56,7 @@ def upgrade() -> None:
         sa.Column("username", sa.String(length=200), nullable=False),
         sa.Column("password", sa.String(length=200), nullable=False),
         sa.Column(
-            "status", sa.Enum("ACTIVE", "INACTIVE", name="statusenum"), nullable=False
+            "status", sa.Enum("active", "inactive", name="statusenum"), nullable=False
         ),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -73,4 +74,6 @@ def downgrade() -> None:
     op.drop_table("users")
     op.drop_table("records")
     op.drop_table("operations")
+    op.execute("drop type operationenum")
+    op.execute("drop type statusenum")
     # ### end Alembic commands ###

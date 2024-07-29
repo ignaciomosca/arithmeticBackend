@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Any, AsyncGenerator
 
 import pytest
@@ -12,6 +13,7 @@ from sqlalchemy.ext.asyncio import (
 
 from arithmetic.db.dependencies import get_db_session
 from arithmetic.db.utils import create_database, drop_database
+from arithmetic.services.security_service import create_access_token
 from arithmetic.settings import settings
 from arithmetic.web.application import get_app
 
@@ -107,4 +109,25 @@ async def client(
     :yield: client for the app.
     """
     async with AsyncClient(app=fastapi_app, base_url="http://test", timeout=2.0) as ac:
+        yield ac
+
+
+@pytest.fixture
+async def authenticated_client(
+    fastapi_app: FastAPI,
+    anyio_backend: Any,
+) -> AsyncGenerator[AsyncClient, None]:
+    """
+    Fixture that creates client for requesting server.
+
+    :param fastapi_app: the application.
+    :yield: client for the app.
+    """
+    token: str = await create_access_token("testUser", 1, 100, timedelta(minutes=20))
+    async with AsyncClient(
+        app=fastapi_app,
+        base_url="http://test",
+        headers={"Authorization": f"Bearer {token}"},
+        timeout=2.0,
+    ) as ac:
         yield ac

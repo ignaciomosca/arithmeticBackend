@@ -6,7 +6,7 @@ from sqlalchemy.sql.sqltypes import Enum, Integer
 from arithmetic.db.base import Base
 
 
-class OperationEnum(PyEnum):
+class OperationEnum(str, PyEnum):
     """Model for operation types."""
 
     ADDITION = "addition"

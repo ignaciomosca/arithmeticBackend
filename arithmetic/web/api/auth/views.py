@@ -1,18 +1,17 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
-import jwt
 from fastapi import APIRouter, Depends, HTTPException
 from passlib.context import CryptContext
 from starlette import status
 
 from arithmetic.db.dao.user_dao import UserDAO
-from arithmetic.settings import settings
+from arithmetic.services.security_service import create_access_token
 from arithmetic.web.api.auth.schema import Token, UserRequest
 
 router = APIRouter()
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-BEARER = "bearer"
+BEARER = "Bearer"
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
@@ -54,22 +53,3 @@ async def login_for_access_token(
         timedelta(minutes=20),
     )
     return Token(access_token=token, token_type=BEARER)
-
-
-async def create_access_token(
-    username: str,
-    user_id: int,
-    user_balance: int,
-    expires_delta: timedelta,
-) -> str:
-    """
-    Create access token for a user.
-
-    :param username: username of the user.
-    :param user_id: id of the user.
-    :param expires_delta: amount of time it takes for the token to expire.
-    """
-    encode = {"sub": username, "id": user_id, "balance": user_balance}
-    expires = datetime.utcnow() + expires_delta
-    encode.update({"exp": expires})
-    return jwt.encode(encode, settings.secret_key, algorithm=settings.algorithm)
