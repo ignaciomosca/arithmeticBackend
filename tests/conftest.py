@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import (
 
 from arithmetic.db.dependencies import get_db_session
 from arithmetic.db.utils import create_database, drop_database
-from arithmetic.services.security_service import create_access_token
+from arithmetic.services.security_utils import create_access_token
 from arithmetic.settings import settings
 from arithmetic.web.application import get_app
 

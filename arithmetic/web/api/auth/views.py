@@ -5,7 +5,7 @@ from passlib.context import CryptContext
 from starlette import status
 
 from arithmetic.db.dao.user_dao import UserDAO
-from arithmetic.services.security_service import create_access_token
+from arithmetic.services.security_utils import create_access_token
 from arithmetic.web.api.auth.schema import Token, UserRequest
 
 router = APIRouter()
