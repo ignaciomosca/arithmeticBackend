@@ -4,6 +4,7 @@ from starlette import status
 from arithmetic.services.operation_service import OperationService
 from arithmetic.services.record_service import RecordService
 from arithmetic.services.security_service import user_dependency
+from arithmetic.services.user_service import UserService
 from arithmetic.web.api.operation.schema import OperationBase
 
 router = APIRouter()
@@ -12,7 +13,8 @@ router = APIRouter()
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def new_operation(
     new_operation: OperationBase,
-    user: user_dependency,
+    validated_user: user_dependency,
+    user_service: UserService = Depends(),
     operation_service: OperationService = Depends(),
     record_service: RecordService = Depends(),
 ) -> str:
@@ -23,6 +25,7 @@ async def new_operation(
     :return: list of operation objects from database.
     """
     operation = await operation_service.get_operation_cost(new_operation.type)
+    user = await user_service.get_user_by_id(validated_user.user_id)
     operation_response = await operation_service.perform_operation(
         user.balance,
         new_operation.type,
@@ -30,7 +33,7 @@ async def new_operation(
         new_operation.second_term,
     )
     await record_service.create_record(
-        user_id=user.user_id,
+        user_id=user.id,
         operation_id=operation.operation_id,
         amount=operation.cost,
         user_balance=user.balance - operation.cost,

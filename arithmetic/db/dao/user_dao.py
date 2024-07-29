@@ -36,7 +36,7 @@ class UserDAO:
         """
         self.session.add(UserModel(username=username, password=password))
 
-    async def get_user_by_id(self, user_id: int) -> Optional[UserModel]:
+    async def get_user_by_id(self, user_id: int) -> UserModel:
         """
         Get a single user model by its user_id.
 
@@ -48,8 +48,6 @@ class UserDAO:
                 select(UserModel).filter_by(id=user_id),
             )
             return result.scalar_one()
-        except NoResultFound:
-            return None
         except Exception as e:
             raise e
 

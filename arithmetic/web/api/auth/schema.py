@@ -20,4 +20,3 @@ class ValidatedUser(BaseModel):
 
     user_id: int
     username: str
-    balance: int

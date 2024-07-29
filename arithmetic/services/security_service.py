@@ -34,8 +34,7 @@ async def get_current_user(
         )
         username: str = payload.get("sub")
         user_id: int = payload.get("id")
-        balance: int = payload.get("balance")
-        return ValidatedUser(username=username, user_id=user_id, balance=balance)
+        return ValidatedUser(username=username, user_id=user_id)
     except jwt.ExpiredSignatureError as err:
         raise jwt_error from err
     except jwt.InvalidTokenError as err:
