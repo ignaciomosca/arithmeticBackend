@@ -1,12 +1,12 @@
 from typing import Annotated
-from datetime import datetime, timedelta
+
 import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from starlette import status
-from arithmetic.web.api.auth.schema import ValidatedUser
 
 from arithmetic.settings import settings
+from arithmetic.web.api.auth.schema import ValidatedUser
 
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
 
@@ -17,10 +17,10 @@ jwt_error = HTTPException(
     detail="Could not validate user",
 )
 
+
 async def get_current_user(
     token: Annotated[str, Depends(oauth2_bearer)],
 ) -> ValidatedUser:
-    
     """
     Gets a user from an OAuth token.
 

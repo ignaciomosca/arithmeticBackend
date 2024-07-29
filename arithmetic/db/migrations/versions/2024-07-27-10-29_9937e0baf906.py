@@ -23,12 +23,18 @@ def upgrade() -> None:
         "fk_records_operations", "records", "operations", ["operation_id"], ["id"]
     )
     op.create_foreign_key("fk_records_users", "records", "users", ["user_id"], ["id"])
-    op.execute("INSERT INTO operations (type, cost) VALUES ('addition', 1)")
-    op.execute("INSERT INTO operations (type, cost) VALUES ('subtraction', 1)")
-    op.execute("INSERT INTO operations (type, cost) VALUES ('multiplication', 1)")
-    op.execute("INSERT INTO operations (type, cost) VALUES ('division', 1)")
-    op.execute("INSERT INTO operations (type, cost) VALUES ('squareRoot', 5)")
-    op.execute("INSERT INTO operations (type, cost) VALUES ('randomString', 10)")
+    op.execute("INSERT INTO operations (operation_type, cost) VALUES ('addition', 1)")
+    op.execute(
+        "INSERT INTO operations (operation_type, cost) VALUES ('subtraction', 1)"
+    )
+    op.execute(
+        "INSERT INTO operations (operation_type, cost) VALUES ('multiplication', 1)"
+    )
+    op.execute("INSERT INTO operations (operation_type, cost) VALUES ('division', 1)")
+    op.execute("INSERT INTO operations (operation_type, cost) VALUES ('squareRoot', 5)")
+    op.execute(
+        "INSERT INTO operations (operation_type, cost) VALUES ('randomString', 10)"
+    )
 
     # ### end Alembic commands ###
 

@@ -22,19 +22,7 @@ def upgrade() -> None:
     op.create_table(
         "operations",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column(
-            "type",
-            sa.Enum(
-                "addition",
-                "subtraction",
-                "multiplication",
-                "division",
-                "squareRoot",
-                "randomString",
-                name="operationenum",
-            ),
-            nullable=False,
-        ),
+        sa.Column("operation_type", sa.String(length=40), nullable=False),
         sa.Column("cost", sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -55,9 +43,7 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("username", sa.String(length=200), nullable=False),
         sa.Column("password", sa.String(length=200), nullable=False),
-        sa.Column(
-            "status", sa.Enum("active", "inactive", name="statusenum"), nullable=False
-        ),
+        sa.Column("status", sa.String(length=10), nullable=False, default="active"),
         sa.PrimaryKeyConstraint("id"),
     )
     op.alter_column(

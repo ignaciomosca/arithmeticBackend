@@ -4,7 +4,6 @@ from typing import Optional, cast
 from fastapi import Depends
 
 from arithmetic.db.dao.operation_dao import OperationDAO
-from arithmetic.db.models.operation_model import OperationEnum as ModelOperationEnum
 from arithmetic.services.random_service import generate_random_string
 from arithmetic.web.api.operation.schema import OperationDTO, OperationEnum
 
@@ -17,28 +16,13 @@ class OperationService:
 
     async def get_operation_cost(self, operation_type: OperationEnum) -> OperationDTO:
         """Given an operation type return the operation id and it's cost."""
+        print("···")
+        print(operation_type.value)
+        print("···")
         operation_model = await self.operation_dao.get_operation(
-            self._to_model_operation_enum(operation_type),
+            str(operation_type.value),
         )
         return OperationDTO(operation_id=operation_model.id, cost=operation_model.cost)
-
-    def _to_model_operation_enum(
-        self,
-        operation_type: OperationEnum,
-    ) -> ModelOperationEnum:
-        match operation_type:
-            case OperationEnum.ADDITION:
-                return ModelOperationEnum.ADDITION
-            case OperationEnum.SUBTRACTION:
-                return ModelOperationEnum.SUBTRACTION
-            case OperationEnum.MULTIPLICATION:
-                return ModelOperationEnum.MULTIPLICATION
-            case OperationEnum.DIVISION:
-                return ModelOperationEnum.DIVISION
-            case OperationEnum.SQUARE:
-                return ModelOperationEnum.SQUARE
-            case OperationEnum.RANDOM:
-                return ModelOperationEnum.RANDOM
 
     async def perform_operation(
         self,

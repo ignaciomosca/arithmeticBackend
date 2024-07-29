@@ -1,20 +1,8 @@
-from enum import Enum as PyEnum
-
+from sqlalchemy import Integer
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.sql.sqltypes import Enum, Integer
+from sqlalchemy.sql.sqltypes import String
 
 from arithmetic.db.base import Base
-
-
-class OperationEnum(str, PyEnum):
-    """Model for operation types."""
-
-    ADDITION = "addition"
-    SUBTRACTION = "subtraction"
-    MULTIPLICATION = "multiplication"
-    DIVISION = "division"
-    SQUARE = "squareRoot"
-    RANDOM = "randomString"
 
 
 class OperationModel(Base):
@@ -23,8 +11,5 @@ class OperationModel(Base):
     __tablename__ = "operations"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    type: Mapped[OperationEnum] = mapped_column(
-        Enum(OperationEnum),
-        default=OperationEnum.RANDOM,
-    )
-    cost: Mapped[int] = mapped_column(Integer)
+    operation_type: Mapped[str] = mapped_column(String(length=40))
+    cost: Mapped[int] = mapped_column(Integer, nullable=False)

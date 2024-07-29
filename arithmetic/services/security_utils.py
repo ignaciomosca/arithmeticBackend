@@ -1,14 +1,16 @@
 from datetime import datetime, timedelta
+
 import jwt
 from fastapi import HTTPException
 from starlette import status
-from arithmetic.settings import settings
 
+from arithmetic.settings import settings
 
 jwt_error = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
     detail="Could not validate user",
 )
+
 
 async def create_access_token(
     username: str,

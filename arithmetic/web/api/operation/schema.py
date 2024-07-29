@@ -4,7 +4,7 @@ from typing import Any, Optional
 from pydantic import BaseModel, Field, model_validator
 
 
-class OperationEnum(str, Enum):
+class OperationEnum(str,Enum):
     """Pydantic model for operation types."""
 
     ADDITION = "addition"
