@@ -40,5 +40,7 @@ async def test_new_operation(
     assert response.status_code == status.HTTP_201_CREATED
     # Use the DAO again to count operations instances after creation
     final_count = await dao.get_all_records(limit=1, offset=0)
+    user = await user_dao.get_user_by_id(1)
     # Assert that the count increased by 1 after creation
     assert len(final_count) == (len(initial_count) + 1)
+    assert user.balance == (100 - 1)

@@ -1,14 +1,20 @@
 from fastapi import Depends
 
 from arithmetic.db.dao.record_dao import RecordDAO
+from arithmetic.db.dao.user_dao import UserDAO
 from arithmetic.db.models.record_model import RecordModel
 
 
 class RecordService:
     """Service class to interact with the records DAO."""
 
-    def __init__(self, record_dao: RecordDAO = Depends()) -> None:
+    def __init__(
+        self,
+        record_dao: RecordDAO = Depends(),
+        user_dao: UserDAO = Depends(),
+    ) -> None:
         self.record_dao = record_dao
+        self.user_dao = user_dao
 
     async def create_record(
         self,
@@ -27,3 +33,4 @@ class RecordService:
             operation_response=operation_response,
         )
         await self.record_dao.create_record(record)
+        await self.user_dao.update_user_balance(user_id, user_balance)

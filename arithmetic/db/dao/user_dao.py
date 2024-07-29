@@ -15,6 +15,18 @@ class UserDAO:
     def __init__(self, session: AsyncSession = Depends(get_db_session)) -> None:
         self.session = session
 
+    async def update_user_balance(self, user_id: int, balance: int) -> None:
+        """
+        Update the balance of a user.
+
+        :param user_id: ID of the user.
+        :param new_balance: New balance to be set for the user.
+        """
+        user = await self.get_user_by_id(user_id)
+        if user:
+            user.balance = balance
+            await self.session.commit()
+
     async def create_user(self, username: str, password: str) -> None:
         """
         Add single user to session.
@@ -23,6 +35,23 @@ class UserDAO:
         :param password: password of a user.
         """
         self.session.add(UserModel(username=username, password=password))
+
+    async def get_user_by_id(self, user_id: int) -> Optional[UserModel]:
+        """
+        Get a single user model by its user_id.
+
+        :param user_id: id of the user.
+        :return: UserModel instance if found, None otherwise.
+        """
+        try:
+            result = await self.session.execute(
+                select(UserModel).filter_by(id=user_id),
+            )
+            return result.scalar_one()
+        except NoResultFound:
+            return None
+        except Exception as e:
+            raise e
 
     async def get_user(self, username: str) -> Optional[UserModel]:
         """
