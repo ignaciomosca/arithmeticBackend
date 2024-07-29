@@ -1,8 +1,10 @@
+from typing import List
+
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
+
 from arithmetic.db.dependencies import get_db_session
 from arithmetic.db.models.operation_model import OperationModel
 
@@ -14,9 +16,14 @@ class OperationDAO:
         self.session = session
 
     async def add_new_operation(self, operation_type: str, cost: int) -> None:
-        new_operation = OperationModel(operation_type = operation_type, cost = cost)
-        self.session.add(new_operation)
+        """
+        Add a new operation.
 
+        :param operation_type: type of the operation.
+        :param cost: cost of the operation.
+        """
+        new_operation = OperationModel(operation_type=operation_type, cost=cost)
+        self.session.add(new_operation)
 
     async def get_all_operations(self) -> List[OperationModel]:
         """

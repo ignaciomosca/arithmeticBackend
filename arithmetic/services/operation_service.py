@@ -16,9 +16,6 @@ class OperationService:
 
     async def get_operation_cost(self, operation_type: OperationEnum) -> OperationDTO:
         """Given an operation type return the operation id and it's cost."""
-        print("···")
-        print(operation_type.value)
-        print("···")
         operation_model = await self.operation_dao.get_operation(
             str(operation_type.value),
         )
