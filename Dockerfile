@@ -25,6 +25,8 @@ RUN apt-get purge -y \
 COPY . /app/src/
 RUN --mount=type=cache,target=/tmp/poetry_cache poetry install --only main
 
+EXPOSE 8000
+
 CMD ["/usr/local/bin/python", "-m", "arithmetic"]
 
 FROM prod AS dev
