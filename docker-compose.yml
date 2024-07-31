@@ -1,5 +1,7 @@
+version: '3.8'
+
 services:
-  api: &main_app
+  api:
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -12,15 +14,16 @@ services:
         condition: service_healthy
     environment:
       ARITHMETIC_HOST: 0.0.0.0
-      ARITHMETIC_DB_HOST: arithmetic-db
+      ARITHMETIC_DB_HOST: db
       ARITHMETIC_DB_PORT: 5432
       ARITHMETIC_DB_USER: arithmetic
       ARITHMETIC_DB_PASS: arithmetic
       ARITHMETIC_DB_BASE: arithmetic
+    ports:
+      - "8000:8000"
 
   db:
     image: postgres:16.3-bullseye
-    hostname: arithmetic-db
     environment:
       POSTGRES_PASSWORD: "arithmetic"
       POSTGRES_USER: "arithmetic"
@@ -41,7 +44,7 @@ services:
     restart: "no"
     command: alembic upgrade head
     environment:
-      ARITHMETIC_DB_HOST: arithmetic-db
+      ARITHMETIC_DB_HOST: db
       ARITHMETIC_DB_PORT: 5432
       ARITHMETIC_DB_USER: arithmetic
       ARITHMETIC_DB_PASS: arithmetic
@@ -49,8 +52,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-
-
 
 volumes:
   arithmetic-db-data:
