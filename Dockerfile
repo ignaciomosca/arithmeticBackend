@@ -25,17 +25,10 @@ RUN apt-get purge -y \
 COPY . /app/src/
 RUN --mount=type=cache,target=/tmp/poetry_cache poetry install --only main
 
-# Copy the entrypoint script
-COPY entrypoint.sh /app/src/entrypoint.sh
-
-# Make the entrypoint script executable
-RUN chmod +x /app/src/entrypoint.sh
-
 # Expose the port for the application
 EXPOSE 8000
 
-# Set the entrypoint to the script
-ENTRYPOINT ["/app/src/entrypoint.sh"]
+CMD ["/usr/local/bin/python", "-m", "authtest"]
 
 FROM prod AS dev
 
