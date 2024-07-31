@@ -28,7 +28,7 @@ RUN --mount=type=cache,target=/tmp/poetry_cache poetry install --only main
 # Expose the port for the application
 EXPOSE 8000
 
-CMD ["/usr/local/bin/python", "-m", "authtest"]
+CMD ["/usr/local/bin/python", "-m", "arithmetic"]
 
 FROM prod AS dev
 
