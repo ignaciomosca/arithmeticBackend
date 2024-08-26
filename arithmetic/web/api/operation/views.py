@@ -64,3 +64,18 @@ async def get_records(
         limit=limit,
         offset=offset,
     )
+
+
+@router.delete("/{record_id}", status_code=status.HTTP_200_OK)
+async def delete_record(
+    _validated_user: user_dependency,
+    record_id: int,
+    record_service: RecordService = Depends(),
+) -> None:
+    """
+    Create and record a new operation.
+
+    :param operation_dao: DAO for operation models.
+    :return: list of operation objects from database.
+    """
+    return await record_service.delete_record(record_id)

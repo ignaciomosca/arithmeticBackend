@@ -1,7 +1,7 @@
 from typing import List
 
 from fastapi import Depends
-from sqlalchemy import select
+from sqlalchemy import not_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from arithmetic.db.dependencies import get_db_session
@@ -38,7 +38,8 @@ class RecordDAO:
         """
         records = await self.session.execute(
             select(RecordModel)
-            .where((RecordModel.user_id == user_id) & (not RecordModel.deleted))
+            .where((RecordModel.user_id == user_id))
+            .filter(not_(RecordModel.deleted))
             .limit(limit)
             .offset(offset),
         )
