@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import Boolean, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.sqltypes import DateTime, Integer, String
 
@@ -27,6 +27,8 @@ class RecordModel(Base):
     user_balance: Mapped[int] = mapped_column(Integer, nullable=False)
     operation_response: Mapped[str] = mapped_column(String(length=200))
     date: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+    operation_text: Mapped[str] = mapped_column(String(length=200))
 
     # Relationships
     operation = relationship("OperationModel", backref="records")

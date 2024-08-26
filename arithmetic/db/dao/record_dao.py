@@ -38,11 +38,20 @@ class RecordDAO:
         """
         records = await self.session.execute(
             select(RecordModel)
-            .where(
-                RecordModel.user_id == user_id,
-            )
+            .where((RecordModel.user_id == user_id) & (not RecordModel.deleted))
             .limit(limit)
             .offset(offset),
         )
 
         return list(records.scalars().fetchall())
+
+    async def delete_record(self, record_id: int) -> None:
+        """
+        Soft deletes a record by setting its deleted_at field to the current timestamp.
+
+        :param record_id: id of the record.
+        """
+        record = await self.session.get(RecordModel, record_id)
+        if record:
+            record.deleted = True
+            await self.session.commit()

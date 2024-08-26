@@ -48,6 +48,10 @@ class RecordService:
         records = await self.record_dao.get_all_records(user_id, limit, offset)
         return self.__convert_records_to_dtos(records)
 
+    async def delete_record(self, record_id: int) -> None:
+        """Deletes a record."""
+        await self.record_dao.delete_record(record_id)
+
     def __convert_records_to_dtos(self, records: List[RecordModel]) -> List[RecordDTO]:
         return [
             RecordDTO(
@@ -56,7 +60,7 @@ class RecordService:
                 amount=record.amount,
                 user_balance=record.user_balance,
                 operation_response=record.operation_response,
-                date=int(record.date.timestamp()),
+                date=record.date.strftime("%Y-%m-%d"),  # Format date as YYYY-MM-DD
             )
             for record in records
         ]
