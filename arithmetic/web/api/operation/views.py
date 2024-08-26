@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends
 from starlette import status
 
@@ -5,7 +7,7 @@ from arithmetic.services.operation_service import OperationService
 from arithmetic.services.record_service import RecordService
 from arithmetic.services.security_service import user_dependency
 from arithmetic.services.user_service import UserService
-from arithmetic.web.api.operation.schema import OperationBase
+from arithmetic.web.api.operation.schema import OperationBase, RecordDTO
 
 router = APIRouter()
 
@@ -40,3 +42,25 @@ async def new_operation(
         operation_response=operation_response,
     )
     return operation_response
+
+
+@router.get("/", status_code=status.HTTP_200_OK)
+async def get_records(
+    validated_user: user_dependency,
+    limit: int = 10,
+    offset: int = 0,
+    user_service: UserService = Depends(),
+    record_service: RecordService = Depends(),
+) -> List[RecordDTO]:
+    """
+    Create and record a new operation.
+
+    :param operation_dao: DAO for operation models.
+    :return: list of operation objects from database.
+    """
+    user = await user_service.get_user_by_id(validated_user.user_id)
+    return await record_service.get_records(
+        user_id=user.id,
+        limit=limit,
+        offset=offset,
+    )

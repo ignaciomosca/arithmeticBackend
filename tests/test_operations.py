@@ -33,13 +33,13 @@ async def test_new_operation(
     await operation_dao.add_new_operation(OperationEnum.RANDOM.value, 10)
 
     await operation_dao.get_all_operations()
-    initial_count = await dao.get_all_records(limit=1, offset=0)
+    initial_count = await dao.get_all_records(user_id=1, limit=1, offset=0)
     # Send a POST request to create the operations
     response = await authenticated_client.post(url, json=operation.model_dump())
     # Assert the response status code is 201 OK
     assert response.status_code == status.HTTP_201_CREATED
     # Use the DAO again to count operations instances after creation
-    final_count = await dao.get_all_records(limit=1, offset=0)
+    final_count = await dao.get_all_records(user_id=1, limit=1, offset=0)
     user = await user_dao.get_user_by_id(1)
     # Assert that the count increased by 1 after creation
     assert len(final_count) == (len(initial_count) + 1)

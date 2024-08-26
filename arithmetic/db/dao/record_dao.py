@@ -22,16 +22,27 @@ class RecordDAO:
         """
         self.session.add(record)
 
-    async def get_all_records(self, limit: int, offset: int) -> List[RecordModel]:
+    async def get_all_records(
+        self,
+        user_id: int,
+        limit: int,
+        offset: int,
+    ) -> List[RecordModel]:
         """
         Returns all records.
 
+        :param user_id: id of the user.
         :param limit: limit of records.
         :param offset: offset of records.
         :return: stream of records.
         """
-        raw_dummies = await self.session.execute(
-            select(RecordModel).limit(limit).offset(offset),
+        records = await self.session.execute(
+            select(RecordModel)
+            .where(
+                RecordModel.user_id == user_id,
+            )
+            .limit(limit)
+            .offset(offset),
         )
 
-        return list(raw_dummies.scalars().fetchall())
+        return list(records.scalars().fetchall())

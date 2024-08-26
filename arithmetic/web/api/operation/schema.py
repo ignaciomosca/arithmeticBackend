@@ -22,6 +22,17 @@ class OperationDTO(BaseModel):
     cost: int
 
 
+class RecordDTO(BaseModel):
+    """DTO that represents a record."""
+
+    id: int
+    user_id: int
+    amount: int
+    user_balance: int
+    operation_response: str
+    date: int
+
+
 class OperationBase(BaseModel):
     """Base Pydantic model for Operation."""
 

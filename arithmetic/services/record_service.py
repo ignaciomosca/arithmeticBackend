@@ -1,8 +1,11 @@
+from typing import List
+
 from fastapi import Depends
 
 from arithmetic.db.dao.record_dao import RecordDAO
 from arithmetic.db.dao.user_dao import UserDAO
 from arithmetic.db.models.record_model import RecordModel
+from arithmetic.web.api.operation.schema import RecordDTO
 
 
 class RecordService:
@@ -34,3 +37,26 @@ class RecordService:
         )
         await self.record_dao.create_record(record)
         await self.user_dao.update_user_balance(user_id, user_balance)
+
+    async def get_records(
+        self,
+        user_id: int,
+        limit: int,
+        offset: int,
+    ) -> List[RecordDTO]:
+        """Call the DAO to fetch the records."""
+        records = await self.record_dao.get_all_records(user_id, limit, offset)
+        return self.__convert_records_to_dtos(records)
+
+    def __convert_records_to_dtos(self, records: List[RecordModel]) -> List[RecordDTO]:
+        return [
+            RecordDTO(
+                id=record.id,
+                user_id=record.user_id,
+                amount=record.amount,
+                user_balance=record.user_balance,
+                operation_response=record.operation_response,
+                date=int(record.date.timestamp()),
+            )
+            for record in records
+        ]
