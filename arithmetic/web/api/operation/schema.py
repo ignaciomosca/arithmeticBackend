@@ -30,6 +30,7 @@ class RecordDTO(BaseModel):
     amount: int
     user_balance: int
     operation_response: str
+    operation_text: str
     date: str
 
 

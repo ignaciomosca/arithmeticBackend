@@ -34,11 +34,17 @@ async def new_operation(
         new_operation.first_term,
         new_operation.second_term,
     )
+
     await record_service.create_record(
         user_id=user.id,
         operation_id=operation.operation_id,
         amount=operation.cost,
         user_balance=user.balance - operation.cost,
+        operation_text=operation_service.get_operation_text(
+            new_operation.type,
+            new_operation.first_term,
+            new_operation.second_term,
+        ),
         operation_response=operation_response,
     )
     return operation_response
@@ -61,6 +67,27 @@ async def get_records(
     user = await user_service.get_user_by_id(validated_user.user_id)
     return await record_service.get_records(
         user_id=user.id,
+        limit=limit,
+        offset=offset,
+    )
+
+
+@router.get("/search/{term}", status_code=status.HTTP_200_OK)
+async def search_records(
+    validated_user: user_dependency,
+    term: str,
+    limit: int = 10,
+    offset: int = 0,
+    record_service: RecordService = Depends(),
+) -> List[RecordDTO]:
+    """
+    Create and record a new operation.
+
+    :param operation_dao: DAO for operation models.
+    :return: list of operation objects from database.
+    """
+    return await record_service.search(
+        term=term,
         limit=limit,
         offset=offset,
     )

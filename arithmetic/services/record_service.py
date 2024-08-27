@@ -25,6 +25,7 @@ class RecordService:
         operation_id: int,
         amount: int,
         user_balance: int,
+        operation_text: str,
         operation_response: str,
     ) -> None:
         """Call the DAO to save a record."""
@@ -34,6 +35,7 @@ class RecordService:
             amount=amount,
             user_balance=user_balance,
             operation_response=operation_response,
+            operation_text=operation_text,
         )
         await self.record_dao.create_record(record)
         await self.user_dao.update_user_balance(user_id, user_balance)
@@ -52,6 +54,11 @@ class RecordService:
         """Deletes a record."""
         await self.record_dao.delete_record(record_id)
 
+    async def search(self, term: str, limit: int, offset: int) -> List[RecordDTO]:
+        """Search a term in the records table."""
+        records = await self.record_dao.search(term, limit, offset)
+        return self.__convert_records_to_dtos(records)
+
     def __convert_records_to_dtos(self, records: List[RecordModel]) -> List[RecordDTO]:
         return [
             RecordDTO(
@@ -60,6 +67,7 @@ class RecordService:
                 amount=record.amount,
                 user_balance=record.user_balance,
                 operation_response=record.operation_response,
+                operation_text=record.operation_text,
                 date=record.date.strftime("%Y-%m-%d"),  # Format date as YYYY-MM-DD
             )
             for record in records

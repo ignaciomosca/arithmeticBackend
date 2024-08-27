@@ -46,3 +46,24 @@ class OperationService:
                 return str(sqrt(float(cast(int, first_term))))  # type: ignore[operator]
             case OperationEnum.RANDOM:
                 return await generate_random_string()
+
+    def get_operation_text(
+        self,
+        type: OperationEnum,
+        first_term: Optional[int],
+        second_term: Optional[int],
+    ) -> str:
+        """Get the operation text based on the type and the terms."""
+        match type:
+            case OperationEnum.ADDITION:
+                return f"{first_term}+{second_term}"
+            case OperationEnum.SUBTRACTION:
+                return f"{first_term}-{second_term}"
+            case OperationEnum.MULTIPLICATION:
+                return f"{first_term}*{second_term}"
+            case OperationEnum.DIVISION:
+                return f"{first_term}/{second_term}"
+            case OperationEnum.SQUARE:
+                return f"sqrt({first_term})"
+            case OperationEnum.RANDOM:
+                return "random"

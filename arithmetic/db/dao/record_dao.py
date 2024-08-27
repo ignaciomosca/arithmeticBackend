@@ -56,3 +56,27 @@ class RecordDAO:
         if record:
             record.deleted = True
             await self.session.commit()
+
+    async def search(
+        self,
+        term: str,
+        limit: int,
+        offset: int,
+    ) -> List[RecordModel]:
+        """
+        Search records by term.
+
+        :param term: search term.
+        :param limit: limit of records.
+        :param offset: offset of records.
+        :return: stream of records.
+        """
+        records = await self.session.execute(
+            select(RecordModel)
+            .where(RecordModel.operation_text.like(f"%{term}%"))
+            .filter(not_(RecordModel.deleted))
+            .limit(limit)
+            .offset(offset),
+        )
+
+        return list(records.scalars().fetchall())
