@@ -7,7 +7,7 @@ from arithmetic.services.operation_service import OperationService
 from arithmetic.services.record_service import RecordService
 from arithmetic.services.security_service import user_dependency
 from arithmetic.services.user_service import UserService
-from arithmetic.web.api.operation.schema import OperationBase, RecordDTO
+from arithmetic.web.api.operation.schema import OperationBase, RecordDTO, RecordsDTO
 
 router = APIRouter()
 
@@ -57,7 +57,7 @@ async def get_records(
     offset: int = 0,
     user_service: UserService = Depends(),
     record_service: RecordService = Depends(),
-) -> List[RecordDTO]:
+) -> RecordsDTO:
     """
     Create and record a new operation.
 

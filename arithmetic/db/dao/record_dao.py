@@ -1,9 +1,10 @@
 from typing import List
 
 from fastapi import Depends
-from sqlalchemy import not_, select
+from sqlalchemy import func, not_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from arithmetic.db.dao.record_response import RecordResponse
 from arithmetic.db.dependencies import get_db_session
 from arithmetic.db.models.record_model import RecordModel
 
@@ -27,7 +28,7 @@ class RecordDAO:
         user_id: int,
         limit: int,
         offset: int,
-    ) -> List[RecordModel]:
+    ) -> RecordResponse:
         """
         Returns all records.
 
@@ -36,6 +37,14 @@ class RecordDAO:
         :param offset: offset of records.
         :return: stream of records.
         """
+
+        total_records = await self.session.execute(
+            select(func.count(RecordModel.id))
+            .where((RecordModel.user_id == user_id))
+            .filter(not_(RecordModel.deleted)),
+        )
+        total_count = total_records.scalar() or 0
+
         records = await self.session.execute(
             select(RecordModel)
             .where((RecordModel.user_id == user_id))
@@ -44,7 +53,10 @@ class RecordDAO:
             .offset(offset),
         )
 
-        return list(records.scalars().fetchall())
+        return RecordResponse(
+            records=list(records.scalars().fetchall()),
+            total_count=total_count,
+        )
 
     async def delete_record(self, record_id: int) -> None:
         """

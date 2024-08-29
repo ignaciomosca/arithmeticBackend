@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -32,6 +32,13 @@ class RecordDTO(BaseModel):
     operation_response: str
     operation_text: str
     date: str
+
+
+class RecordsDTO(BaseModel):
+    """DTO that represents a list of records."""
+
+    records: List[RecordDTO]
+    total_count: int
 
 
 class OperationBase(BaseModel):

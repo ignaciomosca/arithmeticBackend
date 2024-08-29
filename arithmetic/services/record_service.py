@@ -5,7 +5,7 @@ from fastapi import Depends
 from arithmetic.db.dao.record_dao import RecordDAO
 from arithmetic.db.dao.user_dao import UserDAO
 from arithmetic.db.models.record_model import RecordModel
-from arithmetic.web.api.operation.schema import RecordDTO
+from arithmetic.web.api.operation.schema import RecordDTO, RecordsDTO
 
 
 class RecordService:
@@ -45,10 +45,16 @@ class RecordService:
         user_id: int,
         limit: int,
         offset: int,
-    ) -> List[RecordDTO]:
+    ) -> RecordsDTO:
         """Call the DAO to fetch the records."""
-        records = await self.record_dao.get_all_records(user_id, limit, offset)
-        return self.__convert_records_to_dtos(records)
+        records_and_count = await self.record_dao.get_all_records(
+            user_id,
+            limit,
+            offset,
+        )
+        records = self.__convert_records_to_dtos(records_and_count.records)
+        count = records_and_count.total_count
+        return RecordsDTO(records=records, total_count=count)
 
     async def delete_record(self, record_id: int) -> None:
         """Deletes a record."""

@@ -42,5 +42,5 @@ async def test_new_operation(
     final_count = await dao.get_all_records(user_id=1, limit=1, offset=0)
     user = await user_dao.get_user_by_id(1)
     # Assert that the count increased by 1 after creation
-    assert len(final_count) == (len(initial_count) + 1)
+    assert len(final_count.total_count) == (len(initial_count.total_count) + 1)
     assert user.balance == (100 - 1)
