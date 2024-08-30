@@ -30,7 +30,11 @@ def get_app() -> FastAPI:
         default_response_class=UJSONResponse,
     )
 
-    origins = ["http://localhost:3000"]
+    origins = [
+        "http://localhost:3000",
+        "http://www.arithmeticchimichanga.com:8000",
+        "https://arithmetic-frontend.vercel.app",
+    ]
 
     app.add_middleware(
         CORSMiddleware,
