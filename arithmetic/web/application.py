@@ -32,7 +32,7 @@ def get_app() -> FastAPI:
 
     origins = [
         "http://localhost:3000",
-        "http://www.arithmeticchimichanga.com:8000",
+        "https://www.arithmeticchimichanga.com",
         "https://arithmetic-frontend.vercel.app",
     ]
 
