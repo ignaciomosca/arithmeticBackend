@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     db_echo: bool = False
 
     secret_key: str = ""
-    algorithm: str = ""
+    algorithm: str = "HS256"
     random: str = ""
 
     @property
