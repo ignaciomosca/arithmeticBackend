@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from passlib.context import CryptContext
 from starlette import status
 
@@ -27,6 +27,12 @@ async def create_user(
     """
     hashed_password = bcrypt_context.hash(new_user.password)
     await user_dao.create_user(new_user.username, hashed_password)
+
+
+@router.options("/token")
+async def preflight_token() -> Response:
+    """Add options endpoint to prevent CORS error."""
+    return Response(status_code=204)
 
 
 @router.post("/token", response_model=Token)
