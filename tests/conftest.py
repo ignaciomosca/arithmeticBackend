@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+from arithmetic.db.dao.user_dao import UserDAO
 from arithmetic.db.dependencies import get_db_session
 from arithmetic.db.utils import create_database, drop_database
 from arithmetic.services.security_utils import create_access_token
@@ -98,6 +99,22 @@ def fastapi_app(
 
 
 @pytest.fixture
+async def with_user_id(dbsession: AsyncSession) -> int | None:
+    """Create user for tests."""
+    user_dao = UserDAO(dbsession)
+    user_name = "testUser"
+    await user_dao.create_user(user_name, "Asdf!1234")
+    user = await user_dao.get_user(username=user_name)
+    return user.id
+
+
+@pytest.fixture
+async def mock_generate_random_string() -> str:
+    """Returns a mock random string."""
+    "r_an_d_o_m_5tring"
+
+
+@pytest.fixture
 async def client(
     fastapi_app: FastAPI,
     anyio_backend: Any,
@@ -114,6 +131,7 @@ async def client(
 
 @pytest.fixture
 async def authenticated_client(
+    with_user_id: int | None,
     fastapi_app: FastAPI,
     anyio_backend: Any,
 ) -> AsyncGenerator[AsyncClient, None]:
@@ -123,7 +141,12 @@ async def authenticated_client(
     :param fastapi_app: the application.
     :yield: client for the app.
     """
-    token: str = await create_access_token("testUser", 1, 100, timedelta(minutes=20))
+    token: str = await create_access_token(
+        "testUser",
+        with_user_id,
+        100,
+        timedelta(minutes=20),
+    )
     async with AsyncClient(
         app=fastapi_app,
         base_url="http://test",
