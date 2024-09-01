@@ -1,3 +1,5 @@
+from unittest.mock import AsyncMock
+
 import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient
@@ -47,8 +49,23 @@ async def test_random_string(
     fastapi_app: FastAPI,
     authenticated_client: AsyncClient,
     dbsession: AsyncSession,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Tests performing the perform random operation function."""
+
+    # Create a mock for the httpx.AsyncClient.post method
+    async def mock_post(*args: tuple, **kwargs: dict) -> AsyncMock:
+        # Create a mock response object
+        mock_response = AsyncMock()
+        mock_response.status_code = 201
+        mock_response.json.return_value = {
+            "result": {"random": {"data": ["mocked_random_string"]}},
+        }
+        return mock_response
+
+    # Apply the monkeypatch to replace the post method with the mock
+    monkeypatch.setattr(AsyncClient, "post", mock_post)
+
     url = fastapi_app.url_path_for("new_operation")
     operation = OperationBase(type=OperationEnum.RANDOM)
 
