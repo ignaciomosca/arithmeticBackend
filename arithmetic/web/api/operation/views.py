@@ -16,8 +16,8 @@ router = APIRouter()
 async def new_operation(
     new_operation: OperationBase,
     validated_user: user_dependency,
-    user_service: UserService = Depends(),
     operation_service: OperationService = Depends(),
+    user_service: UserService = Depends(),
     record_service: RecordService = Depends(),
 ) -> str:
     """
@@ -26,28 +26,12 @@ async def new_operation(
     :param operation_dao: DAO for operation models.
     :return: list of operation objects from database.
     """
-    operation = await operation_service.get_operation_cost(new_operation.type)
-    user = await user_service.get_user_by_id(validated_user.user_id)
-    operation_response = await operation_service.perform_operation(
-        user.balance,
+    return await operation_service.perform_operation(
+        validated_user.user_id,
         new_operation.type,
         new_operation.first_term,
         new_operation.second_term,
     )
-
-    await record_service.create_record(
-        user_id=user.id,
-        operation_id=operation.operation_id,
-        amount=operation.cost,
-        user_balance=user.balance - operation.cost,
-        operation_text=operation_service.get_operation_text(
-            new_operation.type,
-            new_operation.first_term,
-            new_operation.second_term,
-        ),
-        operation_response=operation_response,
-    )
-    return operation_response
 
 
 @router.get("/", status_code=status.HTTP_200_OK)

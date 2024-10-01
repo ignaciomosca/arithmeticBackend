@@ -5,34 +5,60 @@ from fastapi import Depends
 
 from arithmetic.db.dao.operation_dao import OperationDAO
 from arithmetic.services.random_service import generate_random_string
-from arithmetic.web.api.operation.schema import OperationDTO, OperationEnum
+from arithmetic.services.record_service import RecordService
+from arithmetic.services.user_service import UserService
+from arithmetic.web.api.operation.schema import OperationEnum
 
 
 class OperationService:
     """Service class to implement operation functionalities."""
 
-    def __init__(self, operation_dao: OperationDAO = Depends()) -> None:
+    def __init__(
+        self,
+        operation_dao: OperationDAO = Depends(),
+        user_service: UserService = Depends(),
+        record_service: RecordService = Depends(),
+    ) -> None:
         self.operation_dao = operation_dao
-
-    async def get_operation_cost(self, operation_type: OperationEnum) -> OperationDTO:
-        """Given an operation type return the operation id and it's cost."""
-        operation_model = await self.operation_dao.get_operation(
-            str(operation_type.value),
-        )
-        return OperationDTO(operation_id=operation_model.id, cost=operation_model.cost)
+        self.user_service = user_service
+        self.record_service = record_service
 
     async def perform_operation(
         self,
-        balance: int,
+        user_id: int,
         type: OperationEnum,
         first_term: Optional[int],
         second_term: Optional[int],
     ) -> str:
-        """Perform operation based on the parameters provided by the user."""
-        if balance <= 0:
+        """Perform the operation."""
+        user = await self.user_service.get_user_by_id(user_id)
+        operation = await self.operation_dao.get_operation(str(type.value))
+        if user.balance < operation.cost:
             raise Exception("Not enough balance.")
         # I ignore types since parameters were already validated by using
         # a pydantic validator
+        result = await self.calculate_result(type, first_term, second_term)
+        await self.record_service.create_record(
+            user_id=user.id,
+            operation_id=operation.id,
+            amount=operation.cost,
+            user_balance=user.balance - operation.cost,
+            operation_text=self.get_operation_text(
+                type,
+                first_term,
+                second_term,
+            ),
+            operation_response=result,
+        )
+        return result
+
+    async def calculate_result(
+        self,
+        type: OperationEnum,
+        first_term: Optional[int],
+        second_term: Optional[int],
+    ) -> str:
+        """Perform operation based on the type and parameters provided by the user."""
         match type:
             case OperationEnum.ADDITION:
                 return str(first_term + second_term)  # type: ignore[operator]
