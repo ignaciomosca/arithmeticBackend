@@ -6,6 +6,7 @@ from fastapi import Depends
 from arithmetic.db.dao.operation_dao import OperationDAO
 from arithmetic.services.random_service import generate_random_string
 from arithmetic.services.record_service import RecordService
+from arithmetic.services.user_level_lock import UserLevelLock
 from arithmetic.services.user_service import UserService
 from arithmetic.web.api.operation.schema import OperationEnum
 
@@ -22,6 +23,7 @@ class OperationService:
         self.operation_dao = operation_dao
         self.user_service = user_service
         self.record_service = record_service
+        self.user_lock = UserLevelLock()
 
     async def perform_operation(
         self,
@@ -31,26 +33,29 @@ class OperationService:
         second_term: Optional[int],
     ) -> str:
         """Perform the operation."""
-        user = await self.user_service.get_user_by_id(user_id)
-        operation = await self.operation_dao.get_operation(str(type.value))
-        if user.balance < operation.cost:
-            raise Exception("Not enough balance.")
-        # I ignore types since parameters were already validated by using
-        # a pydantic validator
-        result = await self.calculate_result(type, first_term, second_term)
-        await self.record_service.create_record(
-            user_id=user.id,
-            operation_id=operation.id,
-            amount=operation.cost,
-            user_balance=user.balance - operation.cost,
-            operation_text=self.get_operation_text(
-                type,
-                first_term,
-                second_term,
-            ),
-            operation_response=result,
-        )
-        return result
+        lock = await self.user_lock.acquire(user_id)
+        async with lock:
+            user = await self.user_service.get_user_by_id(user_id)
+            operation = await self.operation_dao.get_operation(str(type.value))
+            if user.balance < operation.cost:
+                raise Exception("Not enough balance.")
+            # I ignore types since parameters were already validated by using
+            # a pydantic validator
+            result = await self.calculate_result(type, first_term, second_term)
+            await self.record_service.create_record(
+                user_id=user.id,
+                operation_id=operation.id,
+                amount=operation.cost,
+                user_balance=user.balance - operation.cost,
+                operation_text=self.get_operation_text(
+                    type,
+                    first_term,
+                    second_term,
+                ),
+                operation_response=result,
+            )
+            await self.user_lock.release(user_id)
+            return result
 
     async def calculate_result(
         self,
