@@ -66,6 +66,10 @@ class OperationBase(BaseModel):
                     f"For operation type '{type_}',"
                     f"both first_term and second_term are required.",
                 )
+            if second_term == 0:
+                raise ValueError(
+                    f"For operation type '{type_}',Division by Zero error.",
+                )
         elif type_ == OperationEnum.SQUARE:
             if first_term is None:
                 raise ValueError(
@@ -75,6 +79,11 @@ class OperationBase(BaseModel):
                 raise ValueError(
                     f"For operation type '{type_}',"
                     f"second_term should not be provided.",
+                )
+            if first_term < 0:
+                raise ValueError(
+                    f"For operation type '{type_}',"
+                    f"Square root of a negative number.",
                 )
         elif type_ == OperationEnum.RANDOM and (
             first_term is not None or second_term is not None

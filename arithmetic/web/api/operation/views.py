@@ -17,8 +17,6 @@ async def new_operation(
     new_operation: OperationBase,
     validated_user: user_dependency,
     operation_service: OperationService = Depends(),
-    user_service: UserService = Depends(),
-    record_service: RecordService = Depends(),
 ) -> str:
     """
     Create and record a new operation.
