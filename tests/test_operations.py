@@ -33,8 +33,11 @@ async def test_addition_operation(
     initial_count = await dao.get_all_records(user_id=with_user_id, limit=1, offset=0)
     # Send a POST request to create the operations
     response = await authenticated_client.post(url, json=operation.model_dump())
+
     # Assert the response status code is 201 OK
     assert response.status_code == status.HTTP_201_CREATED
+    assert response.text == '"3"'
+
     # Use the DAO again to count operations instances after creation
     final_count = await dao.get_all_records(user_id=with_user_id, limit=1, offset=0)
     user = await user_dao.get_user_by_id(with_user_id)
@@ -70,6 +73,7 @@ async def test_substraction_operation(
     response = await authenticated_client.post(url, json=operation.model_dump())
     # Assert the response status code is 201 OK
     assert response.status_code == status.HTTP_201_CREATED
+    assert response.text == '"1"'
     # Use the DAO again to count operations instances after creation
     final_count = await dao.get_all_records(user_id=with_user_id, limit=1, offset=0)
     user = await user_dao.get_user_by_id(with_user_id)
@@ -105,6 +109,7 @@ async def test_multiplication_operation(
     response = await authenticated_client.post(url, json=operation.model_dump())
     # Assert the response status code is 201 OK
     assert response.status_code == status.HTTP_201_CREATED
+    assert response.text == '"6"'
     # Use the DAO again to count operations instances after creation
     final_count = await dao.get_all_records(user_id=with_user_id, limit=1, offset=0)
     user = await user_dao.get_user_by_id(with_user_id)
@@ -136,6 +141,7 @@ async def test_division_operation(
     response = await authenticated_client.post(url, json=operation.model_dump())
     # Assert the response status code is 201 OK
     assert response.status_code == status.HTTP_201_CREATED
+    assert response.text == '"2.0"'
     # Use the DAO again to count operations instances after creation
     final_count = await dao.get_all_records(user_id=with_user_id, limit=1, offset=0)
     user = await user_dao.get_user_by_id(with_user_id)
@@ -188,6 +194,7 @@ async def test_square_root_operation(
     response = await authenticated_client.post(url, json=operation.model_dump())
     # Assert the response status code is 201 OK
     assert response.status_code == status.HTTP_201_CREATED
+    assert response.text == '"2.0"'
     # Use the DAO again to count operations instances after creation
     final_count = await dao.get_all_records(user_id=with_user_id, limit=1, offset=0)
     user = await user_dao.get_user_by_id(with_user_id)
