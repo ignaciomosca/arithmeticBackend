@@ -13,13 +13,13 @@ from arithmetic.web.api.operation.schema import OperationBase, OperationEnum
 
 
 @pytest.mark.anyio
-async def test_new_operation(
+async def test_addition_operation(
     fastapi_app: FastAPI,
     with_user_id: int | None,
     authenticated_client: AsyncClient,
     dbsession: AsyncSession,
 ) -> None:
-    """Tests performing the perform operation function."""
+    """Tests performing the perform an addition."""
     url = fastapi_app.url_path_for("new_operation")
     operation = OperationBase(type=OperationEnum.ADDITION, first_term=1, second_term=2)
     dao = RecordDAO(dbsession)
@@ -41,6 +41,180 @@ async def test_new_operation(
     # Assert that the count increased by 1 after creation
     assert final_count.total_count == initial_count.total_count + 1
     assert user.balance == (100 - 1)
+
+
+@pytest.mark.anyio
+async def test_substraction_operation(
+    fastapi_app: FastAPI,
+    with_user_id: int | None,
+    authenticated_client: AsyncClient,
+    dbsession: AsyncSession,
+) -> None:
+    """Tests performing the perform a substraction."""
+    url = fastapi_app.url_path_for("new_operation")
+    operation = OperationBase(
+        type=OperationEnum.SUBTRACTION,
+        first_term=3,
+        second_term=2,
+    )
+    dao = RecordDAO(dbsession)
+
+    user_dao = UserDAO(dbsession)
+
+    operation_dao = OperationDAO(dbsession)
+    await operation_dao.add_new_operation(OperationEnum.SUBTRACTION.value, 1)
+
+    await operation_dao.get_all_operations()
+    initial_count = await dao.get_all_records(user_id=with_user_id, limit=1, offset=0)
+    # Send a POST request to create the operations
+    response = await authenticated_client.post(url, json=operation.model_dump())
+    # Assert the response status code is 201 OK
+    assert response.status_code == status.HTTP_201_CREATED
+    # Use the DAO again to count operations instances after creation
+    final_count = await dao.get_all_records(user_id=with_user_id, limit=1, offset=0)
+    user = await user_dao.get_user_by_id(with_user_id)
+    # Assert that the count increased by 1 after creation
+    assert final_count.total_count == initial_count.total_count + 1
+    assert user.balance == (100 - 1)
+
+
+@pytest.mark.anyio
+async def test_multiplication_operation(
+    fastapi_app: FastAPI,
+    with_user_id: int | None,
+    authenticated_client: AsyncClient,
+    dbsession: AsyncSession,
+) -> None:
+    """Tests performing the perform a multiplication."""
+    url = fastapi_app.url_path_for("new_operation")
+    operation = OperationBase(
+        type=OperationEnum.MULTIPLICATION,
+        first_term=3,
+        second_term=2,
+    )
+    dao = RecordDAO(dbsession)
+
+    user_dao = UserDAO(dbsession)
+
+    operation_dao = OperationDAO(dbsession)
+    await operation_dao.add_new_operation(OperationEnum.MULTIPLICATION.value, 1)
+
+    await operation_dao.get_all_operations()
+    initial_count = await dao.get_all_records(user_id=with_user_id, limit=1, offset=0)
+    # Send a POST request to create the operations
+    response = await authenticated_client.post(url, json=operation.model_dump())
+    # Assert the response status code is 201 OK
+    assert response.status_code == status.HTTP_201_CREATED
+    # Use the DAO again to count operations instances after creation
+    final_count = await dao.get_all_records(user_id=with_user_id, limit=1, offset=0)
+    user = await user_dao.get_user_by_id(with_user_id)
+    # Assert that the count increased by 1 after creation
+    assert final_count.total_count == initial_count.total_count + 1
+    assert user.balance == (100 - 1)
+
+
+@pytest.mark.anyio
+async def test_division_operation(
+    fastapi_app: FastAPI,
+    with_user_id: int | None,
+    authenticated_client: AsyncClient,
+    dbsession: AsyncSession,
+) -> None:
+    """Tests performing the perform a division."""
+    url = fastapi_app.url_path_for("new_operation")
+    operation = OperationBase(type=OperationEnum.DIVISION, first_term=4, second_term=2)
+    dao = RecordDAO(dbsession)
+
+    user_dao = UserDAO(dbsession)
+
+    operation_dao = OperationDAO(dbsession)
+    await operation_dao.add_new_operation(OperationEnum.DIVISION.value, 1)
+
+    await operation_dao.get_all_operations()
+    initial_count = await dao.get_all_records(user_id=with_user_id, limit=1, offset=0)
+    # Send a POST request to create the operations
+    response = await authenticated_client.post(url, json=operation.model_dump())
+    # Assert the response status code is 201 OK
+    assert response.status_code == status.HTTP_201_CREATED
+    # Use the DAO again to count operations instances after creation
+    final_count = await dao.get_all_records(user_id=with_user_id, limit=1, offset=0)
+    user = await user_dao.get_user_by_id(with_user_id)
+    # Assert that the count increased by 1 after creation
+    assert final_count.total_count == initial_count.total_count + 1
+    assert user.balance == (100 - 1)
+
+
+@pytest.mark.anyio
+async def test_division_by_zero_operation(
+    fastapi_app: FastAPI,
+    with_user_id: int | None,
+    authenticated_client: AsyncClient,
+    dbsession: AsyncSession,
+) -> None:
+    """Tests performing the perform a division by zero and check for error."""
+    url = fastapi_app.url_path_for("new_operation")
+
+    operation_data = {"type": "DIVISION", "first_term": 4, "second_term": 0}
+
+    operation_dao = OperationDAO(dbsession)
+    await operation_dao.add_new_operation(OperationEnum.DIVISION.value, 1)
+
+    # Send a POST request to create the operations
+    response = await authenticated_client.post(url, json=operation_data)
+    # Assert the response status code is 201 OK
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.anyio
+async def test_square_root_operation(
+    fastapi_app: FastAPI,
+    with_user_id: int | None,
+    authenticated_client: AsyncClient,
+    dbsession: AsyncSession,
+) -> None:
+    """Tests performing the perform a square root."""
+    url = fastapi_app.url_path_for("new_operation")
+    operation = OperationBase(type=OperationEnum.SQUARE, first_term=4)
+    dao = RecordDAO(dbsession)
+
+    user_dao = UserDAO(dbsession)
+
+    operation_dao = OperationDAO(dbsession)
+    await operation_dao.add_new_operation(OperationEnum.SQUARE.value, 5)
+
+    await operation_dao.get_all_operations()
+    initial_count = await dao.get_all_records(user_id=with_user_id, limit=1, offset=0)
+    # Send a POST request to create the operations
+    response = await authenticated_client.post(url, json=operation.model_dump())
+    # Assert the response status code is 201 OK
+    assert response.status_code == status.HTTP_201_CREATED
+    # Use the DAO again to count operations instances after creation
+    final_count = await dao.get_all_records(user_id=with_user_id, limit=1, offset=0)
+    user = await user_dao.get_user_by_id(with_user_id)
+    # Assert that the count increased by 1 after creation
+    assert final_count.total_count == initial_count.total_count + 1
+    assert user.balance == (100 - 5)
+
+
+@pytest.mark.anyio
+async def test_square_root_of_negative_number_operation(
+    fastapi_app: FastAPI,
+    with_user_id: int | None,
+    authenticated_client: AsyncClient,
+    dbsession: AsyncSession,
+) -> None:
+    """Tests performing the square root of a negative number and check for error."""
+    url = fastapi_app.url_path_for("new_operation")
+    operation_dao = OperationDAO(dbsession)
+    await operation_dao.add_new_operation(OperationEnum.SQUARE.value, 5)
+
+    operation_data = {"type": "SQUARE", "first_term": -5}
+
+    await operation_dao.get_all_operations()
+    # Send a POST request to create the operations
+    response = await authenticated_client.post(url, json=operation_data)
+    # Assert the response status code is 201 OK
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.anyio
